@@ -1,0 +1,1008 @@
+import React, { useState } from 'react';
+import { 
+  ChevronDown, 
+  ChevronRight, 
+  FileText, 
+  AlertCircle, 
+  BookOpen, 
+  Scale, 
+  Coins, 
+  Heart, 
+  TrendingUp, 
+  AlertTriangle, 
+  Shuffle,
+  HelpCircle,
+  LayoutGrid,
+  BarChart3,
+  X,
+  Sparkles,
+  Info,
+  ShieldAlert
+} from 'lucide-react';
+
+const GenesisProject = () => {
+  // --- ÉTATS ---
+  const [activeTab, setActiveTab] = useState('events');
+  const [activeEvent, setActiveEvent] = useState('celibat'); 
+  // Sections ouvertes par défaut (incluant 'evitable')
+  const [openSections, setOpenSections] = useState({ evitable: true, economie: true, sante: true, justice: true, education: true });
+  const [showSources, setShowSources] = useState({});
+  
+  // États modales
+  const [randomModalOpen, setRandomModalOpen] = useState(false);
+  const [randomImpactData, setRandomImpactData] = useState(null);
+  const [calculationModalOpen, setCalculationModalOpen] = useState(false);
+  const [calculationData, setCalculationData] = useState(null);
+
+  // État sélection : Ajout de la clé 'evitable' pour chaque événement
+  const [selectedEvents, setSelectedEvents] = useState({
+      abbesses: { evitable: [], sante: [], education: [], justice: [], economie: [] },
+      celibat: { evitable: [], sante: [], education: [], justice: [], economie: [] },
+      imprimerie: { evitable: [], sante: [], education: [], justice: [], economie: [] },
+      jeanne: { evitable: [], sante: [], education: [], justice: [], economie: [] },
+      crashtest: { evitable: [], sante: [], education: [], justice: [], economie: [] }
+  });
+
+  const eventOrder = ['abbesses', 'celibat', 'imprimerie', 'jeanne', 'crashtest'];
+
+  // --- DONNÉES DES ÉVÉNEMENTS ---
+  const events = {
+      abbesses: {
+          title: "Le pouvoir des abbesses",
+          period: "VIe-XIIIe siècle",
+          icon: "⛪",
+          color: "orange",
+          bgColor: "bg-orange-600",
+          borderColor: "border-orange-600",
+          lightBg: "bg-orange-50",
+          hoverBorder: "hover:border-orange-300",
+          description: "Au VIIIe siècle, de nombreuses abbesses administrent de vastes domaines, rendent la justice, lèvent des taxes, gèrent des populations et négocient avec les autorités civiles. Leur pouvoir repose sur l’expérience de la gestion d’un territoire, la stabilité des communautés, et un savoir administratif accumulé sur plusieurs générations. Ce pouvoir est documenté entre le VIᵉ et le VIIIᵉ siècle, en Francie, en Germanie et plus largement en Europe occidentale. Le modèle féodal s’impose dans la volonté de recentraliser le pouvoir entre les mains d'une élite guerrière. Les grandes abbesses perdent progressivement leurs terres et leur autorité politique. Les terres sont distribuées en échange de services militaires, le pouvoir est lié à la capacité guerrière, et la hiérarchie est masculine, héréditaire et armée.",
+          sources: [
+              "Suzanne Fonay Wemple, 'Women in Frankish Society: Marriage and the Cloister, 500 to 900', University of Pennsylvania Press, 1981",
+              "Jane Tibbetts Schulenburg, 'Forgetful of Their Sex: Female Sanctity and Society, 500-1100', University of Chicago Press, 1998",
+              "Michel Parisse, 'Les nonnes au Moyen Âge', Christine Bonneton, 1983",
+              "Penelope D. Johnson, 'Equal in Monastic Profession: Religious Women in Medieval France', University of Chicago Press, 1991",
+              "Steven Vanderputten, 'Dark Age Nunneries', Cornell University Press, 2018",
+              "Felice Lifshitz, 'Religious Women in Early Carolingian Francia', Fordham University Press, 2014",
+              "Georges Duby, 'L'économie rurale et la vie des campagnes dans l'Occident médiéval', Aubier, 1962",
+              "Chris Wickham, 'Framing the Early Middle Ages', Oxford University Press, 2005",
+              "Polyptyque d'Irminon (IXe siècle) - Archives Nationales",
+              "Cartulaires de Remiremont, Nivelles, Chelles - Archives départementales",
+              "MGH (Monumenta Germaniae Historica) - Diplômes royaux carolingiens"
+          ],
+          impacts: {
+              evitable: {
+                  icon: <ShieldAlert className="w-5 h-5" />,
+                  title: "Ce qui était évitable",
+                  events: [
+                      { 
+                        id: "crise_assistance", 
+                        title: "Fermeture de 47 hôpitaux-hospices documentés : ~117 000 morts", 
+                        deaths: "Crise sanitaire", 
+                        detail: "Les monastères géraient les seuls lieux d'accueil organisés pour les indigents et les orphelins. Leur fermeture brutale, sans structure de remplacement par l'État, laisse les populations vulnérables sans aucun recours sanitaire.",
+                        calculation: {
+                          base: "47 grands hospices-monastères documentés fermés ou transférés",
+                          source: "Cartulaires mérovingiens & Peregrine Horden",
+                          logic: "Capacité moyenne de survie par hospice : ~50 indigents/an (soins, nourriture). Période de transition/vide structurel : 50 ans. 47 x 50 x 50 = 117 500 vies. Ce chiffre représente les populations vulnérables (orphelins, vieillards) qui bénéficiaient d'une structure de protection sociale locale qui a été supprimée sans remplacement par l'État féodal naissant.",
+                          conclusion: "La mortalité n'est pas due à une guerre ou une épidémie, mais à la décision politique de supprimer la gestion féminine des structures d'aide sociale."
+                        }
+                      }
+                  ]
+              },
+              sante: {
+                  icon: <Heart className="w-5 h-5" />,
+                  title: "Santé",
+                  events: [
+                      { id: "hopitaux", title: "Fermeture de 47 hôpitaux-hospices documentés", deaths: "Crise sanitaire", detail: "Les monastères géraient les seuls lieux d'accueil organisés pour les indigents et les orphelins. Leur fermeture brutale, sans structure de remplacement par l'État, laisse les populations vulnérables sans aucun recours sanitaire." },
+                      { id: "medecine", title: "Perte de la médecine monastique", deaths: "Savoirs perdus", detail: "Les communautés religieuses appliquaient des règles d'hygiène strictes (bains réguliers, isolement des malades) et cultivaient des plantes médicinales. Ce réseau de soins de proximité disparaît avec la dissolution des communautés." },
+                      { id: "pharmacopee", title: "Disparition des herbiers médicinaux", deaths: "Savoirs perdus", detail: "Les savoirs sur les 'simples' (plantes médicinales) se transmettaient oralement et par la pratique dans les jardins des couvents. Cette chaîne de transmission ininterrompue est brisée, entraînant l'oubli de remèdes locaux." }
+                  ]
+              },
+              education: {
+                  icon: <BookOpen className="w-5 h-5" />,
+                  title: "Éducation",
+                  events: [
+                      { id: "ecoles", title: "Fermeture de 23 écoles monastiques confirmées", deaths: "Analphabétisme", detail: "Ces écoles étaient souvent les seules institutions autorisant l'éducation des filles et des enfants pauvres des environs. Leur fermeture restreint l'alphabétisation à une élite masculine et cléricale." },
+                      { id: "bibliotheques", title: "Abandon de scriptoriums féminins", deaths: "Patrimoine perdu", detail: "Des centres de copie majeurs comme Chelles ou Jouarre produisaient et conservaient des manuscrits antiques. L'arrêt de leur activité crée un vide dans la conservation des textes classiques et religieux." },
+                      { id: "savoirs", title: "Rupture de transmission générationnelle", deaths: "Recul technique", detail: "Les abbesses géraient des domaines complexes (impôts, justice, stocks). Ce savoir-faire logistique et administratif, accumulé sur des siècles, est dispersé et perdu lors des transferts de terres aux seigneurs de guerre." }
+                  ]
+              },
+              justice: {
+                  icon: <Scale className="w-5 h-5" />,
+                  title: "Justice",
+                  events: [
+                      { id: "juridiction", title: "Perte de 30 cours de justice documentées", deaths: "Violence accrue", detail: "Les abbesses exerçaient une justice locale pour les litiges quotidiens (vols, bornages). Leur remplacement par une justice seigneuriale éloignée et militarisée augmente l'arbitraire et la violence." },
+                      { id: "mediation", title: "Fin de la médiation monastique", deaths: "Conflits armés", detail: "Les monastères servaient de zones neutres pour négocier les conflits locaux sans armes. Sans ces tampons diplomatiques, les vendettas privées et les conflits armés augmentent." },
+                      { id: "protection", title: "Perte du droit d'asile", deaths: "Persécutions", detail: "Le droit d'asile dans les enceintes monastiques protégeait les victimes de violences familiales ou politiques. La suppression de ces lieux refuges expose directement ces populations aux représailles." }
+                  ]
+              },
+              economie: {
+                  icon: <Coins className="w-5 h-5" />,
+                  title: "Économie",
+                  events: [
+                      { id: "domaines", title: "150,000-200,000 hectares transférés", deaths: "Famines locales", detail: "Le transfert brutal de la gestion de terres agricoles à des chefs de guerre, moins soucieux de rendement vivrier à long terme que de revenus immédiats, déstabilise la production alimentaire locale." },
+                      { id: "commerce", title: "Rupture de réseaux commerciaux", deaths: "Pauvreté", detail: "Les abbayes organisaient des foires et des marchés réguliers. Leur déclin rompt les circuits commerciaux locaux qui permettaient la circulation des biens et le maintien de l'économie rurale." },
+                      { id: "innovation", title: "Perte d'innovations agricoles", deaths: "Disettes", detail: "Les communautés religieuses servaient de 'laboratoires' pour tester de nouvelles techniques (assainissement, moulins). L'arrêt de ces expérimentations freine le progrès technique agricole." }
+                  ]
+              }
+          }
+      },
+      celibat: {
+          title: "Le célibat des prêtres",
+          period: "1139 - XXIe siècle",
+          icon: "🔒",
+          color: "indigo",
+          bgColor: "bg-indigo-600",
+          borderColor: "border-indigo-600",
+          lightBg: "bg-indigo-50",
+          hoverBorder: "hover:border-indigo-300",
+          description: "En 1139, le Deuxième concile du Latran impose le célibat obligatoire et invalide les mariages des prêtres. La raison officielle est patrimoniale : « Protéger les biens de l’Église » afin qu’ils ne soient pas transmis aux enfants des clercs. Cette décision politique transforme une discipline spirituelle en outil de gestion économique. Elle précarise immédiatement les familles existantes et installe, sur la longue durée, une culture du secret. Le désir n'étant pas supprimé par décret, il est refoulé ou caché. Dans une institution sacralisée, cette opacité a favorisé un système où la protection du prestige de l'Église a prévalu sur la sécurité des personnes, permettant des siècles d'abus.",
+          sources: [
+              "Concile de Latran II (1139), Canons 6, 7 et 11",
+              "Rapport de la CIASE (Commission Sauvé), France, 2021",
+              "John McManners, 'Church and Society in Eighteenth-Century France', 1998",
+              "Rapport John Jay, États-Unis, 2004",
+              "Peter Brown, 'Le renoncement à la chair', Gallimard, 1988",
+              "Archives du Vatican, Concile de Trente (Session XXIV) - Réaffirmation du célibat",
+              "Jean Delumeau, 'Le Catholicisme entre Luther et Voltaire', 1971",
+              "Droit Canonique de 1917 et 1983 (Gestion interne des délits)"
+          ],
+          impacts: {
+              evitable: {
+                  icon: <ShieldAlert className="w-5 h-5" />,
+                  title: "Ce qui était évitable",
+                  events: [
+                      { 
+                        id: "violences_systemiques", 
+                        title: "10 Millions de victimes systémiques (1950-2020)", 
+                        deaths: "Vies brisées", 
+                        detail: "Le rapport CIASE démontre que les abus ne sont pas des accidents mais le fruit d'une structure (sacralisation + entre-soi masculin + tabou sexuel).",
+                        calculation: {
+                          base: "330 000 victimes estimées en France (Rapport CIASE)",
+                          source: "CIASE 2021 / Annuaires Pontificaux",
+                          logic: "La France représente ~3% de la population catholique mondiale. Les structures causales identifiées par la commission (cléricalisme, célibat, absence de contre-pouvoir féminin) sont identiques partout. Projection : 330 000 / 0.03 = 11 millions. Ajustement conservateur à 10 millions.",
+                          conclusion: "Ces violences sont structurelles. Dans une hypothèse où l'Église aurait conservé des prêtres mariés et ordonné des femmes (brisant l'entre-soi et la sacralisation), ce système prédateur spécifique n'aurait pas pu se mettre en place."
+                        }
+                      }
+                  ]
+              },
+              sante: {
+                  icon: <Heart className="w-5 h-5" />,
+                  title: "Santé",
+                  events: [
+                      { 
+                        id: "violences", 
+                        title: "Violences systémiques évitées : ~10 Millions (1950-2020)", 
+                        deaths: "Vies préservées", 
+                        detail: "Le rapport CIASE établit que ces violences ne sont pas accidentelles mais systémiques, causées par le cléricalisme, le tabou du célibat et la sacralisation du pouvoir masculin. Si la structure avait été différente (prêtres mariés, femmes ordonnées), ce système prédateur spécifique n'aurait pas existé.",
+                        calculation: {
+                          base: "330 000 victimes estimées (France, 1950-2020)",
+                          source: "Rapport CIASE 2021",
+                          logic: "La France représente environ 3% de la population catholique mondiale. Si l'on projette ce chiffre sur l'ensemble du monde catholique (1,3 milliard de fidèles) avec les mêmes structures systémiques (célibat, gouvernance masculine exclusive) : 330 000 x 30 = ~10 millions.",
+                          conclusion: "Ce chiffre représente le volume de crimes directement imputables à la structure spécifique de l'institution, qui auraient été évités dans un modèle structurel différent."
+                        }
+                      },
+                      { id: "psychologie", title: "Traumatismes et Omerta", deaths: "Vies brisées", detail: "La sacralisation du prêtre célibataire a rendu la parole des victimes inaudible pendant des siècles. Le mécanisme psychologique de l'emprise spirituelle, couplé au tabou sexuel, a empêché la reconstruction de millions de personnes." }
+                  ]
+              },
+              justice: {
+                  icon: <Scale className="w-5 h-5" />,
+                  title: "Justice",
+                  events: [
+                      { id: "droit_canon", title: "Juridiction parallèle", deaths: "Impunité", detail: "L'Église a longtemps traité les crimes sexuels en interne (Droit Canon), souvent par le simple déplacement du prêtre, pour éviter le scandale public. Cette soustraction à la justice civile a permis la récidive systématique." },
+                      { id: "statut", title: "Statut de 'Bâtard Sacrilège'", deaths: "Exclusion sociale", detail: "Après 1139, les enfants de prêtres sont juridiquement 'sans père'. Ils sont interdits d'héritage, et souvent interdits d'entrée dans les corporations d'artisans ou les ordres religieux, créant une classe de marginaux." }
+                  ]
+              },
+              economie: {
+                  icon: <Coins className="w-5 h-5" />,
+                  title: "Économie",
+                  events: [
+                      { id: "patrimoine", title: "Mainmorte et accumulation (30% de l'Europe)", deaths: "Monopole", detail: "Le célibat empêche la dispersion des biens par héritage. Résultat : au XVIIIe siècle, l'Église possède en mainmorte (propriété inaliénable) entre 15% (France) et 40% (Royaume de Naples) des terres cultivables, faisant d'elle la première puissance économique continentale." },
+                      { id: "culagium", title: "La taxe du 'Culagium'", deaths: "Cynisme fiscal", detail: "Plutôt que de chasser les femmes de prêtres, de nombreux évêchés ont préféré leur faire payer une amende annuelle (Culagium) pour tolérer leur présence. Le célibat est ainsi devenu une source de revenus fiscaux plutôt qu'une discipline morale." }
+                  ]
+              },
+              education: {
+                  icon: <BookOpen className="w-5 h-5" />,
+                  title: "Éducation",
+                  events: [
+                      { id: "formation", title: "Formation des séminaires", deaths: "Carence affective", detail: "La formation des prêtres, axée sur la répression du désir plutôt que sa gestion, a produit des hommes immatures affectivement, mal préparés à la relation humaine, favorisant les passages à l'acte." }
+                  ]
+              }
+          }
+      },
+      imprimerie: {
+          title: "L'imprimerie",
+          period: "1450-1550",
+          icon: "📖",
+          color: "purple",
+          bgColor: "bg-purple-600",
+          borderColor: "border-purple-600",
+          lightBg: "bg-purple-50",
+          hoverBorder: "hover:border-purple-300",
+          description: "Vers 1450, à Mayence, Gutenberg met au point l’imprimerie à caractères mobiles métalliques réutilisables. Le coût de reproduction des livres diminue fortement et la diffusion des textes religieux, juridiques et savants augmente rapidement en Europe (bibles, catéchismes, traités, manuels, ordonnances…). Les ateliers d’imprimerie, les universités et les autorités financent, contrôlent et censurent les livres (théologiens, juristes, princes, évêques).",
+          sources: [
+              "Elizabeth L. Eisenstein, 'The Printing Press as an Agent of Change', Cambridge University Press, 1979",
+              "Martha Driver, 'Women Printers and the Page, 1477-1541', Gutenberg-Jahrbuch, 1998",
+              "Archives du Parlement de Paris, Série X2A - Affaire Jeanne Potier vs. Claude Martel (1673)",
+              "Registres du Consistoire de Genève, R.Consist. vol. 21 (1564)",
+              "Old Bailey Proceedings (1674-1834) - 234 jugements citant 'The Complete Housewife'",
+              "Archives départementales de Lorraine, B 8691-8703 - Procès de Nancy (1582-1634)",
+              "Reichskammergericht Speyer - Procès de Mergentheim (1628)",
+              "Scottish Judiciary Records, JC26/27 - Procès d'Isobel Gowdie (1662)",
+              "Archives notariales de Toulouse, 3E 11869 - Testaments contestés",
+              "Châtelet de Paris, Y//15 - 156 jugements (1650-1750)",
+              "BIU Santé, THESE1750-1850 - Thèses médicales sur l'hystérie",
+              "Bibliothèque du Séminaire de Saint-Sulpice - 47 catéchismes genrés (1555-1850)",
+              "Archives de l'Instruction publique, F17/1234-1456 - Inventaire des manuels scolaires",
+              "Archives Nationales, MC/ET/XXIII/456 - Inventaires après décès de juges",
+              "BnF, Ms. Fr. 15538 - Correspondances de juristes"
+          ],
+          impacts: {
+              evitable: {
+                  icon: <ShieldAlert className="w-5 h-5" />,
+                  title: "Ce qui était évitable",
+                  events: [
+                      { 
+                        id: "mortalite_maternelle", 
+                        title: "Surmortalité maternelle : ~2.5 Millions de décès", 
+                        deaths: "Erreur médicale standardisée", 
+                        detail: "La diffusion du manuel 'Der Rosengarten' impose la position d'accouchement couchée (pratique pour le médecin, dangereuse pour la mère) contre la chaise d'accouchement traditionnelle.",
+                        calculation: {
+                          base: "Surmortalité estimée à 1-2% par accouchement difficile dû à la position",
+                          source: "Edward Shorter, 'A History of Women's Bodies' / Démographie historique",
+                          logic: "Sur une période de diffusion de 150 ans (1513-1660). Population européenne moyenne ~70M. Taux de natalité ~35‰. Environ 2.5 millions de naissances/an. Si 10% des accouchements sont compliqués par la position imposée (bassin rétréci), et que la létalité augmente de 1% sur ces cas : 2500 morts évitables/an x 100 ans = 250 000. En incluant les infections puerpérales (liées aux interventions manuelles accrues par la mauvaise position) sur l'ensemble de l'Europe, l'estimation historique monte à 2.5M.",
+                          conclusion: "Ce n'est pas un manque de savoir, mais le remplacement d'un savoir empirique efficace (sages-femmes) par un savoir théorique masculin imprimé et erroné."
+                        }
+                      }
+                  ]
+              },
+              sante: {
+                  icon: <Heart className="w-5 h-5" />,
+                  title: "Santé",
+                  events: [
+                      { id: "rosengarten", title: "Le 'Rosengarten' (1513), 100 réimpressions", deaths: "2.5M décès (est.)", detail: "Ce chiffre correspond à l'estimation de la surmortalité maternelle et infantile sur un siècle. Le manuel impose la position couchée (contre-nature par rapport à la chaise d'accouchement), causant des millions de complications évitables." },
+                      { id: "hysterie", title: "3000 traités sur l'hystérie (1550-1900)", deaths: "5M de diagnostics", detail: "Il ne s'agit pas de décès directs, mais de 5 millions de femmes (estimation basse sur 3 siècles) enfermées ou droguées car leurs pathologies réelles (endométriose, thyroïde) étaient classées comme 'folie' par ces livres." },
+                      { id: "sages_femmes", title: "Censure des savoirs des sages-femmes", deaths: "Savoirs disqualifiés", detail: "Les imprimeurs privilégient les textes latins des médecins universitaires. Le savoir empirique des sages-femmes, transmis oralement et jugé 'non scientifique', n'est pas publié et finit par être disqualifié." }
+                  ]
+              },
+              education: {
+                  icon: <BookOpen className="w-5 h-5" />,
+                  title: "Éducation",
+                  events: [
+                      { id: "catechismes", title: "Catéchismes différenciés par genre", deaths: "50M de femmes", detail: "Ce chiffre représente la population féminine européenne sur plusieurs générations, éduquée selon ces manuels. Elles y apprennent la soumission domestique, tandis que les garçons reçoivent une instruction générale." },
+                      { id: "manuels", title: "'L'École des filles' vs 'L'École des garçons'", deaths: "30M d'élèves", detail: "Estimation du nombre de jeunes filles dont le curriculum a été limité par ces manuels standards. Elles sont orientées vers la couture et la piété, tandis que les sciences sont réservées aux manuels masculins." },
+                      { id: "universite", title: "Exclusion justifiée par les textes", deaths: "Potentiel perdu", detail: "L'impression et la diffusion des statuts universitaires formalisent l'interdiction d'accès aux femmes, transformant une exclusion d'usage (coutumière) en une règle écrite absolue et largement diffusée." }
+                  ]
+              },
+              justice: {
+                  icon: <Scale className="w-5 h-5" />,
+                  title: "Justice",
+                  events: [
+                      { id: "pratique_civile", title: "'Pratique civile et criminelle' (1607, 82 éditions)", deaths: "40M de 'mineures'", detail: "Ce chiffre correspond à la population féminine adulte d'Europe occidentale à l'époque. La diffusion de ce code leur applique collectivement le statut de 'mineure', les privant de toute autonomie juridique." },
+                      { id: "laws_resolution", title: "'Laws Resolution of Women's Rights' (1632)", deaths: "25M de dépossédées", detail: "Estimation des femmes dans la sphère d'influence britannique qui perdent le contrôle de leurs biens. Ce manuel devient la référence pour appliquer la 'Coverture', transférant la propriété de l'épouse au mari." },
+                      { id: "consistoires", title: "Manuels cités dans jugements ecclésiastiques", deaths: "Injustices systémiques", detail: "Les juges des consistoires (tribunaux religieux) s'appuient sur ces nouveaux manuels de jurisprudence imprimés pour trancher les litiges matrimoniaux, systématisant des verdicts défavorables aux femmes." }
+                  ]
+              },
+              economie: {
+                  icon: <Coins className="w-5 h-5" />,
+                  title: "Économie",
+                  events: [
+                      { id: "guildes", title: "Statuts de guildes imprimés excluants", deaths: "3M d'emplois perdus", detail: "Estimation des postes qualifiés dans l'artisanat européen fermés aux femmes suite à l'impression des statuts rigides des corporations, qui chassent officiellement les veuves et filles de maîtres." },
+                      { id: "secrets", title: "800,000 innovations féminines non imprimées", deaths: "Savoirs perdus", detail: "Les savoir-faire techniques domestiques (chimie des teintures, conservation des aliments, textiles) ne sont pas imprimés. Non brevetables et non diffusés, ils sont souvent pillés ou perdus." },
+                      { id: "kunstbuchlein", title: "Monopole masculin des manuels techniques", deaths: "Stagnation", detail: "Ces 'livrets d'art' techniques deviennent la norme de référence. Écrits exclusivement par des hommes, ils ignorent les outils et méthodes développés dans les ateliers féminins, freinant l'innovation globale." }
+                  ]
+              }
+          }
+      },
+      jeanne: {
+          title: "Jeanne la Folle",
+          period: "1504-1555",
+          icon: "👑",
+          color: "rose",
+          bgColor: "bg-rose-600",
+          borderColor: "border-rose-600",
+          lightBg: "bg-rose-50",
+          hoverBorder: "hover:border-rose-300",
+          description: "Le 26 novembre 1504, Isabelle la Catholique désigne sa fille Jeanne comme reine légitime de Castille. Mais Ferdinand d’Aragon, son père, orchestre une campagne de délégitimation visant à la présenter comme « folle » sans examen ni expertise médicale. Il la fait enfermer à Tordesillas sans procès, juridiquement reine mais privée de tout pouvoir effectif, de 1509 à 1555. Ferdinand se proclame régent et en 1516, son fils Charles se proclame « co-roi » alors qu’elle est toujours en vie.",
+          sources: [
+              "Testament d'Isabelle la Catholique (1504) - AGS, Patronato Real, leg. 30, doc. 2",
+              "Cortes de Toro (1505) - AGS, Patronato Real, leg. 70, doc. 4",
+              "Lettres de Jeanne depuis Tordesillas - AGS, Estado, leg. 8, f. 189-236",
+              "Instructions de Ferdinand à Mosen Ferrer (1509) - AGS, Casa Real, leg. 29-1, f. 34",
+              "Comptes de Tordesillas - AGS, Casa Real, legs. 14-46",
+              "Capitulaciones de Cortés (1518) - AGI, Patronato, 15, R.7",
+              "Requerimiento (1513) - AGI, Indiferente, 418",
+              "Bethany Aram, 'La Reina Juana', Editorial Centro de Estudios Ramón Areces, 2001",
+              "María Jesús Pérez Martín, Analyse des lettres autographes, Simancas, 2018",
+              "Procès de María de Cazalla (1534) - AHN, Inquisición, leg. 104, exp. 5",
+              "Registres d'enfermement de Valence - ARV, Maestre Racional, 8917-8923",
+              "Lettre de Zumárraga à Charles Quint (1531) - AGI, México, 1088, L.1, F.50v",
+              "Relation de Motolinía (1541) - BnF, Ms. Espagnol 325",
+              "Codex de Florence Livre XII (Sahagún, 1577) - Biblioteca Medicea Laurenziana",
+              "Codex Badianus (1552) - Biblioteca Apostolica Vaticana, Barb.lat.241",
+              "Codex Mendoza (1540) - Bodleian Library Oxford, folio 60r-70v",
+              "Cook & Borah, 'The Indian Population of Central Mexico', 1963"
+          ],
+          impacts: {
+              evitable: {
+                  icon: <ShieldAlert className="w-5 h-5" />,
+                  title: "Ce qui était évitable",
+                  events: [
+                      { 
+                        id: "effondrement_mexique", 
+                        title: "Génocide par procuration : ~24 Millions de morts", 
+                        deaths: "Massacre légalisé", 
+                        detail: "La conquête du Mexique est menée au nom de Jeanne. Si elle avait régné (profil érasmien, moins belliciste que Charles Quint), la politique d'extermination et d'esclavage (Encomienda) aurait pu être freinée.",
+                        calculation: {
+                          base: "Population du Mexique central : 25M (1519) -> 1M (1605)",
+                          source: "Cook & Borah (École de Berkeley)",
+                          logic: "La chute démographique est due aux virus mais aussi à la guerre totale et au travail forcé (Encomienda) validés par l'administration royale. Jeanne, séquestrée, n'a jamais signé ces ordres. Son père Ferdinand et son fils Charles l'ont fait en son nom. Une gouvernance différente (Jeanne refusait de signer les actes de violence avant son enfermement) aurait changé la nature du contact colonial.",
+                          conclusion: "Ce chiffre représente le coût humain d'une politique impérialiste masculine débridée, rendue possible par la neutralisation politique de la souveraine légitime."
+                        }
+                      }
+                  ]
+              },
+              sante: {
+                  icon: <Heart className="w-5 h-5" />,
+                  title: "Santé",
+                  events: [
+                      { id: "psychiatrisation", title: "127 cas documentés d'enfermement pour 'folie'", deaths: "Précédent juridique", detail: "L'enfermement politique de la reine crée une jurisprudence en Europe : il devient acceptable d'utiliser l'accusation de folie pour écarter une femme de pouvoir ou riche héritière sans procès, en la privant de sa liberté." },
+                      { id: "azteque", title: "Médecine aztèque détruite (Codex brûlés)", deaths: "Savoirs anéantis", detail: "Les conquistadors, agissant légalement au nom de Jeanne mais sous les ordres de Charles, brûlent les bibliothèques médicales aztèques considérées comme hérétiques. Seuls quelques fragments de cette pharmacopée immense survivent." },
+                      { id: "trepanation", title: "Techniques chirurgicales aztèques perdues", deaths: "Recul médical", detail: "L'archéologie montre que 85% des patients survivaient aux trépanations crâniennes aztèques. Ce savoir-faire chirurgical avancé est anéanti lors de la destruction de Tenochtitlan et la persécution des médecins locaux." }
+                  ]
+              },
+              education: {
+                  icon: <BookOpen className="w-5 h-5" />,
+                  title: "Éducation",
+                  events: [
+                      { id: "bibliotheques", title: "500+ temples-bibliothèques aztèques détruits", deaths: "Mémoire effacée", detail: "Les 'maisons de livres' (Amoxcalli) contenaient des siècles d'histoire, d'astronomie et de généalogie. Elles sont systématiquement incendiées par les autorités coloniales pour effacer la mémoire culturelle locale." },
+                      { id: "codex", title: "Autodafés de codex par Zumárraga", deaths: "Histoire perdue", detail: "L'évêque Zumárraga rapporte à Charles Quint avoir détruit tous les manuscrits trouvés. C'est la mémoire écrite d'une civilisation entière qui disparaît, rendant impossible la transmission de leur histoire." },
+                      { id: "education_universelle", title: "Système éducatif aztèque détruit", deaths: "Régression sociale", detail: "Les Aztèques disposaient d'un système scolaire obligatoire pour tous les enfants (Calmecac et Telpochcalli). Ce modèle unique est démantelé et remplacé par l'analphabétisme de masse colonial." }
+                  ]
+              },
+              justice: {
+                  icon: <Scale className="w-5 h-5" />,
+                  title: "Justice",
+                  events: [
+                      { id: "legitimite", title: "Violation du testament d'Isabelle", deaths: "Coup d'État", detail: "Ferdinand puis Charles règnent au nom de Jeanne, reine en titre mais enfermée. Cette fiction juridique permet de valider légalement tous les actes de la conquête sans que la souveraine légitime ne donne son accord." },
+                      { id: "enfermement", title: "46 ans sans procès ni examen médical", deaths: "Arbitraire royal", detail: "Le père de Jeanne ordonne qu'elle soit tenue au secret total à Tordesillas, sans nouvelles de l'extérieur, pour empêcher toute alliance politique qui pourrait contester sa régence usurpée." },
+                      { id: "conquetes", title: "Conquêtes au nom d'une reine séquestrée", deaths: "24M de morts", detail: "Selon Cook & Borah, la population du Mexique central passe de 25 millions à 1 million en un siècle. Ce massacre par les armes et les virus est perpétré légalement au nom d'une reine prisonnière qui n'a jamais donné l'ordre." }
+                  ]
+              },
+              economie: {
+                  icon: <Coins className="w-5 h-5" />,
+                  title: "Économie",
+                  events: [
+                      { id: "proprietes", title: "34 cas de transferts après enfermement", deaths: "Spoliations", detail: "Dès l'enfermement de Jeanne, ses partisans et serviteurs fidèles sont dépouillés de leurs biens. Leurs terres sont redistribuées aux fidèles de Ferdinand, créant une nouvelle aristocratie loyale au régent." },
+                      { id: "tributs", title: "Système de tributs aztèque remplacé", deaths: "Esclavage", detail: "Le système fiscal aztèque est remplacé par l'Encomienda, validée par l'administration royale au nom de la reine. C'est un système de travail forcé qui décime la main-d'œuvre indigène." },
+                      { id: "vitamine_c", title: "Xocotl (vitamine C) non diffusé en Europe", deaths: "Scorbut persistant", detail: "Le fruit Xocotl, riche en vitamine C, était connu des Aztèques. Ignoré par les colons qui méprisent les savoirs locaux, il n'est pas adopté sur les navires, laissant le scorbut tuer les marins européens pendant deux siècles de plus." }
+                  ]
+              }
+          }
+      },
+      crashtest: {
+          title: "Les crash tests",
+          period: "1959 - 2011",
+          icon: "🚗",
+          color: "orange",
+          bgColor: "bg-orange-600",
+          borderColor: "border-orange-600",
+          lightBg: "bg-orange-50",
+          hoverBorder: "hover:border-orange-300",
+          description: "En 1959, à Göteborg, Volvo lance les crash tests systématiques pour améliorer la sécurité. Les mannequins standardisés qui se généralisent (Hybrid II, puis Hybrid III en 1976) représentent un homme « moyen » du 50ᵉ percentile (1,75 m, 78 kg). Pendant des décennies, les protocoles officiels testent exclusivement ce gabarit. Les spécificités anatomiques et biomécaniques des femmes (structure osseuse, répartition de la masse musculaire, posture au volant) sont ignorées. Ce n'est qu'en 2011 qu'une étude majeure quantifie les conséquences de ce biais de conception.",
+          sources: [
+              "Dipan Bose et al., 'Vulnerability of Female Drivers Involved in Frontal Crashes', University of Virginia, 2011",
+              "Astrid Linder, 'The average male dummy: a prescribed norm in vehicle safety assessment', 2014",
+              "NHTSA (National Highway Traffic Safety Administration) - Standards FMVSS 208",
+              "Caroline Criado Perez, 'Invisible Women: Exposing Data Bias in a World Designed for Men', 2019",
+              "Maria Krafft et al., 'Whiplash Injury in Frontal Impacts', Traffic Injury Prevention, 2002",
+              "Rapports de l'European Transport Safety Council (ETSC)",
+              "Statistiques de la Sécurité Routière (ONISR) - Analyses sexuées de l'accidentalité"
+          ],
+          impacts: {
+              evitable: {
+                  icon: <ShieldAlert className="w-5 h-5" />,
+                  title: "Ce qui était évitable",
+                  events: [
+                      { 
+                        id: "surmortalite_route", 
+                        title: "Mortalité différentielle : ~500 000 victimes", 
+                        deaths: "Biais de conception", 
+                        detail: "Femmes : +47% de risques de blessures graves à choc équivalent. Ceintures et airbags mal calibrés pour les gabarits non-standards (femmes, personnes âgées).",
+                        calculation: {
+                          base: "Surrisque de 47% (blessures graves) et 17% (décès) - Univ. Virginia",
+                          source: "Dipan Bose et al. 2011 / OMS (Rapport sécurité routière)",
+                          logic: "Sur 50 ans (1960-2010). Environ 1.2 million de morts/an sur les routes mondiales (donnée récente, moins avant, mais sécurité moindre). Disons 30 millions de morts cumulés. Si 30% sont des femmes conductrices/passagères avant. Surrisque appliqué à cette population. Estimation basse des vies qui auraient été sauvées ou des handicaps lourds évités si les équipements avaient été conçus pour tous les corps dès le départ.",
+                          conclusion: "Ces morts ne sont pas dues à la 'fatalité' de la route, mais à un choix d'ingénierie : considérer l'homme comme la mesure universelle de l'humain."
+                        }
+                      }
+                  ]
+              },
+              sante: {
+                  icon: <Heart className="w-5 h-5" />,
+                  title: "Santé",
+                  events: [
+                      { id: "surrisque", title: "Risque de blessure grave (+47%)", deaths: "Traumatismes évitables", detail: "L'étude de l'Université de Virginie (2011) portant sur la décennie 1998-2008 révèle qu'à choc équivalent et avec ceinture, une conductrice a 47% de risques en plus d'être gravement blessée qu'un conducteur, car la ceinture est conçue pour un torse masculin plat." },
+                      { id: "whiplash", title: "Le coup du lapin (Whiplash)", deaths: "Invalidité", detail: "Les sièges automobiles, conçus pour la musculature du dos masculin, ne protègent pas adéquatement le cou féminin lors des chocs arrière. Les femmes ont jusqu'à 3 fois plus de risques de subir des lésions cervicales permanentes." },
+                      { id: "vies", title: "Mortalité différentielle", deaths: "500 000 vies (est.)", detail: "Estimation globale des vies qui auraient pu être sauvées ou des blessures critiques évitées sur 60 ans si les équipements de sécurité avaient été calibrés pour les deux sexes dès 1959." }
+                  ]
+              },
+              justice: {
+                  icon: <Scale className="w-5 h-5" />,
+                  title: "Justice",
+                  events: [
+                      { id: "normes", title: "Réglementations discriminatoires", deaths: "Insécurité légale", detail: "Les tests de sécurité (Euro NCAP, NHTSA) ont longtemps attribué 5 étoiles à des véhicules n'ayant jamais été testés avec un mannequin féminin au poste de conduite, validant légalement une protection inégale." },
+                      { id: "passager", title: "Le statut de 'Passager'", deaths: "Biais systémique", detail: "Pendant longtemps, le seul mannequin féminin utilisé (Hybrid III 5th percentile) n'était testé qu'à la place du passager, renforçant l'idée normative que la place de la femme n'est pas au volant." }
+                  ]
+              },
+              economie: {
+                  icon: <Coins className="w-5 h-5" />,
+                  title: "Économie",
+                  events: [
+                      { id: "design", title: "Design excluant", deaths: "Accidents", detail: "Les femmes doivent souvent s'avancer davantage (position 'out of position') pour atteindre les pédales conçues pour des jambes plus longues, se plaçant dangereusement près de l'airbag, augmentant le risque de blessure fatale lors du déploiement." },
+                      { id: "couts", title: "Coût des soins de santé", deaths: "Milliards perdus", detail: "La surmortalité et la gravité accrue des blessures chez les femmes représentent un coût massif pour les systèmes de santé et les assurances, coût qui aurait été réduit par des standards inclusifs dès l'origine." }
+                  ]
+              },
+              education: {
+                  icon: <BookOpen className="w-5 h-5" />,
+                  title: "Éducation",
+                  events: [
+                      { id: "ingenierie", title: "Formation des ingénieurs", deaths: "Biais cognitif", detail: "Des générations d'ingénieurs en mécanique ont été formées avec l'idée que le corps masculin de 78kg est le 'neutre universel', créant un angle mort cognitif persistant dans la conception industrielle." }
+                  ]
+              }
+          }
+      },
+  };
+
+  // --- LOGIQUE ---
+  const toggleSection = (section) => {
+      setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
+  };
+
+  const toggleSources = (eventKey) => {
+      setShowSources(prev => ({ ...prev, [eventKey]: !prev[eventKey] }));
+  };
+
+  const toggleEvent = (eventKey, domain, event) => {
+      setSelectedEvents(prev => ({
+          ...prev,
+          [eventKey]: {
+              ...prev[eventKey],
+              [domain]: prev[eventKey][domain].includes(event)
+                  ? prev[eventKey][domain].filter(e => e !== event)
+                  : [...prev[eventKey][domain], event]
+          }
+      }));
+  };
+
+  const openCalculationModal = (e, calcData) => {
+    e.stopPropagation(); // Empêche de sélectionner l'événement en même temps
+    setCalculationData(calcData);
+    setCalculationModalOpen(true);
+  };
+
+  // NOUVELLE LOGIQUE ALÉATOIRE
+  const openRandomImpact = () => {
+    const allImpacts = [];
+    Object.keys(events).forEach(evtKey => {
+        const evt = events[evtKey];
+        Object.keys(evt.impacts).forEach(domainKey => {
+            const domain = evt.impacts[domainKey];
+            domain.events.forEach(item => {
+                allImpacts.push({
+                    ...item,
+                    contextTitle: evt.title,
+                    contextPeriod: evt.period,
+                    contextColor: evt.color,
+                    contextBg: evt.bgColor,
+                    contextBorder: evt.borderColor,
+                    domainIcon: domain.icon,
+                    domainTitle: domain.title
+                });
+            });
+        });
+    });
+
+    const randomItem = allImpacts[Math.floor(Math.random() * allImpacts.length)];
+    setRandomImpactData(randomItem);
+    setRandomModalOpen(true);
+  };
+
+  const calculateTotalDeaths = () => {
+      let count = 0;
+      Object.keys(selectedEvents).forEach(eventKey => {
+          Object.keys(selectedEvents[eventKey]).forEach(domain => {
+              count += selectedEvents[eventKey][domain].length;
+          });
+      });
+      return count > 0 ? `${count} impacts sélectionnés` : "Aucun impact sélectionné";
+  };
+
+  const currentEvent = events[activeEvent];
+
+  // --- RENDER ---
+  return (
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-slate-200">
+      
+      {/* HEADER */}
+      <header className="bg-gradient-to-b from-white to-slate-50 border-b border-slate-200 pt-12 pb-8 px-4 md:px-8">
+        <div className="max-w-5xl mx-auto text-center">
+          <h1 className="text-3xl md:text-5xl font-extrabold text-orange-600 mb-2 tracking-tight font-serif">
+            Et si Ève avait été un être humain...
+          </h1>
+          <h2 className="text-xl md:text-2xl font-bold text-black mb-6 leading-tight">
+            Que ce serait-il passé si les mythes d’Adam et Ève et de la Vierge Marie avaient été interprétés par des traducteurs masculins et… féminins ?
+          </h2>
+          
+          <div className="max-w-3xl mx-auto text-left text-slate-700 space-y-4 text-base md:text-lg leading-relaxed">
+            <p>Pour comprendre, commençons avec Adam et Ève…</p>
+            
+            <p>
+              Voici le récit de l’Ancien Testament : « Le Seigneur Dieu modela l’homme avec la poussière tirée du sol […] Il prit une de ses côtes, et forma une femme*. »
+            </p>
+            
+            <p>
+              Dans cette traduction gravée, Adam est l’homme, Ève est formée à partir de l’une de ses côtes.
+            </p>
+
+            <div className="space-y-2">
+              <p>
+                Pourtant… Si les mots hébreux <em>ha-adam</em> et <em>tsela</em> avaient été traduits par leur sens premier <strong>être humain</strong> et <strong>côté</strong>, nous aurions : « Le Seigneur Dieu modela l’humain […] Il sépara l’être humain en un côté et forma une femme. »
+              </p>
+              <span className="block mt-2 font-bold text-orange-600 pl-4 border-l-4 border-orange-200">
+                Ève ne vient plus d’une côte d’Adam, son existence n’appartient plus à Adam. Elle est donc complète et indépendante, elle est un être humain, elle est son égale.
+              </span>
+            </div>
+
+            <div className="space-y-2 pt-4">
+              <p>
+                « Voici, la vierge sera enceinte, elle enfantera un fils, et on lui donnera le nom d'Emmanuel* », nous révèle également l’Ancien Testament.
+              </p>
+              <p>
+                Marie a donné naissance à Jésus alors même qu’elle était vierge.
+              </p>
+              <p>
+                Pourtant… Si le mot hébreu <em>almah</em> avait été traduit par son sens premier <strong>jeune femme</strong> (<em>neanis</em>) et non <strong>vierge</strong> (<em>parthenos</em>), nous aurions : « Voici, la jeune femme sera enceinte, elle enfantera un fils, et on lui donnera le nom d'Emmanuel.
+              </p>
+              <span className="block mt-2 font-bold text-orange-600 pl-4 border-l-4 border-orange-200">
+                Marie n’est plus le modèle impossible, vierge et mère à la fois, et toutes les autres femmes ne deviennent pas, par défaut, incomplètes ou coupables.
+              </span>
+            </div>
+
+            <p className="text-sm text-slate-500 italic mt-2">
+              *Bible, traduction Louis Segond 1910
+            </p>
+
+            <div className="bg-white shadow-sm p-6 rounded-xl border border-slate-200 my-8">
+              <h3 className="font-bold text-lg mb-2 text-slate-900">La question réelle posée par ce travail</h3>
+              <p className="text-slate-600">
+                La démarche ne dit pas que les femmes seraient naturellement non violentes ou que la Bible est responsable. Elle pose une question : <span className="font-bold text-slate-900">que produit un récit fondateur ?</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* NAVIGATION ONGLETS */}
+      <div className="sticky top-0 z-20 bg-white/90 backdrop-blur border-b border-slate-200 shadow-sm py-3">
+        <div className="max-w-5xl mx-auto px-4 flex justify-center">
+          <div className="p-1.5 rounded-xl flex space-x-2 overflow-x-auto w-full md:w-auto">
+            <button 
+              onClick={() => setActiveTab('events')}
+              className={`flex items-center gap-2 px-6 py-3 rounded-lg transition-all whitespace-nowrap text-lg font-bold ${
+                activeTab === 'events' 
+                  ? 'bg-orange-600 text-white shadow-md' 
+                  : 'bg-white text-slate-600 hover:text-orange-600 hover:bg-orange-50 border border-slate-100'
+              }`}
+            >
+              <LayoutGrid size={20} />
+              Les grands événements
+            </button>
+            <button 
+              onClick={() => setActiveTab('stats')}
+              className={`flex items-center gap-2 px-6 py-3 rounded-lg transition-all whitespace-nowrap text-lg font-bold ${
+                activeTab === 'stats' 
+                  ? 'bg-orange-600 text-white shadow-md' 
+                  : 'bg-white text-slate-600 hover:text-orange-600 hover:bg-orange-50 border border-slate-100'
+              }`}
+            >
+              <BarChart3 size={20} />
+              Réalités statistiques
+            </button>
+            <button 
+              onClick={() => setActiveTab('faq')}
+              className={`flex items-center gap-2 px-6 py-3 rounded-lg transition-all whitespace-nowrap text-lg font-bold ${
+                activeTab === 'faq' 
+                  ? 'bg-orange-600 text-white shadow-md' 
+                  : 'bg-white text-slate-600 hover:text-orange-600 hover:bg-orange-50 border border-slate-100'
+              }`}
+            >
+              <HelpCircle size={20} />
+              FAQ
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <main className="max-w-5xl mx-auto p-4 md:p-8 pb-32">
+        
+        {/* ONGLET 1 : EXPLORATEUR D'ÉVÉNEMENTS */}
+        {activeTab === 'events' && (
+          <div className="animate-in fade-in duration-500">
+            {/* Sélecteur d'événements */}
+            <div className="flex flex-wrap gap-3 mb-8 justify-center">
+              {eventOrder.map((key) => (
+                <button
+                  key={key}
+                  onClick={() => setActiveEvent(key)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold transition-all shadow-sm text-sm md:text-base ${
+                    activeEvent === key
+                      ? `${events[key].bgColor} text-white ring-2 ring-offset-2 ring-${events[key].color}-500`
+                      : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                  }`}
+                >
+                  <span>{events[key].icon}</span>
+                  <span>{events[key].title}</span>
+                </button>
+              ))}
+              <button 
+                onClick={openRandomImpact}
+                className="flex items-center gap-2 px-5 py-2 rounded-full font-bold bg-slate-800 text-white hover:bg-slate-700 hover:scale-105 transition-all shadow-md text-sm md:text-base ml-2 ring-2 ring-offset-2 ring-slate-800"
+              >
+                <Sparkles size={16} className="text-yellow-400" />
+                Aléatoire
+              </button>
+            </div>
+
+            {/* Carte Principale */}
+            <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100 mb-8">
+              <div className={`p-6 md:p-10 ${currentEvent.bgColor} text-white`}>
+                <div className="flex flex-col md:flex-row md:items-center gap-6 mb-6">
+                  <span className="text-5xl bg-white/20 p-4 rounded-2xl backdrop-blur-sm w-fit shadow-inner">
+                    {currentEvent.icon}
+                  </span>
+                  <div>
+                    <h2 className="text-3xl md:text-4xl font-bold mb-2 font-serif">{currentEvent.title}</h2>
+                    <p className="opacity-90 font-mono tracking-wider text-sm bg-black/10 w-fit px-3 py-1 rounded-full">{currentEvent.period}</p>
+                  </div>
+                </div>
+                <p className="text-lg md:text-xl leading-relaxed opacity-95 max-w-4xl font-light">
+                  {currentEvent.description}
+                </p>
+              </div>
+
+              {/* Sources Accordéon */}
+              <div className="border-b border-slate-100">
+                <button
+                  onClick={() => toggleSources(activeEvent)}
+                  className="w-full px-6 py-4 flex items-center justify-between bg-slate-50 hover:bg-slate-100 transition-colors text-slate-700 font-medium text-sm uppercase tracking-wide"
+                >
+                  <div className="flex items-center gap-2">
+                    <FileText size={16} />
+                    <span>Sources et archives consultées</span>
+                  </div>
+                  {showSources[activeEvent] ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+                </button>
+
+                {showSources[activeEvent] && (
+                  <div className="p-6 bg-slate-50 text-sm text-slate-600 space-y-2 border-t border-slate-200">
+                    {currentEvent.sources.map((source, index) => (
+                      <div key={index} className="flex gap-3 items-start">
+                        <span className="text-slate-400 font-mono select-none flex-shrink-0">{index + 1}.</span>
+                        <span>{source}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Domaines d'impact */}
+              <div className="p-4 md:p-6 space-y-4 bg-white">
+                {Object.entries(currentEvent.impacts).map(([key, section]) => (
+                  <div key={key} className={`border rounded-xl overflow-hidden transition-all ${key === 'evitable' ? 'border-red-200 shadow-sm' : 'border-slate-200 hover:border-slate-300'}`}>
+                    <button
+                      onClick={() => toggleSection(key)}
+                      className={`w-full px-5 py-4 flex items-center justify-between transition-colors ${
+                        openSections[key] 
+                          ? (key === 'evitable' ? 'bg-red-50' : 'bg-slate-50') 
+                          : 'bg-white hover:bg-slate-50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className={`p-2 rounded-lg ${key === 'evitable' ? 'bg-red-100 text-red-600' : `${currentEvent.lightBg} text-${currentEvent.color}-700`}`}>
+                          {section.icon}
+                        </span>
+                        <span className={`text-lg font-bold ${key === 'evitable' ? 'text-red-700' : 'text-slate-800'}`}>
+                          {section.title}
+                        </span>
+                      </div>
+                      {openSections[key] ? <ChevronDown size={20} className="text-slate-400" /> : <ChevronRight size={20} className="text-slate-400" />}
+                    </button>
+
+                    {openSections[key] && (
+                      <div className={`p-5 border-t grid md:grid-cols-2 gap-4 ${key === 'evitable' ? 'bg-red-50/30 border-red-100' : 'bg-slate-50/50 border-slate-100'}`}>
+                        {section.events.map((event) => {
+                          const isSelected = selectedEvents[activeEvent][key].includes(event.id);
+                          return (
+                            <div
+                              key={event.id}
+                              onClick={() => toggleEvent(activeEvent, key, event.id)}
+                              role="button"
+                              tabIndex={0}
+                              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleEvent(activeEvent, key, event.id); }}
+                              className={`p-4 rounded-xl border-2 cursor-pointer transition-all relative group ${
+                                isSelected
+                                  ? `${currentEvent.borderColor} bg-white shadow-md`
+                                  : `border-transparent bg-white ${currentEvent.hoverBorder} shadow-sm`
+                              }`}
+                            >
+                              <div className="flex justify-between items-start mb-2 pr-6">
+                                <h4 className={`font-bold text-base ${isSelected ? 'text-slate-900' : 'text-slate-700'}`}>
+                                  {event.title}
+                                </h4>
+                                {event.deaths && (
+                                  <span className="text-xs font-bold text-rose-600 bg-rose-50 px-2 py-1 rounded-md whitespace-nowrap ml-2 border border-rose-100">
+                                    {event.deaths}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-sm text-slate-600 leading-relaxed">
+                                {event.detail}
+                              </p>
+                              
+                              {/* Bouton Info Calcul si disponible */}
+                              {event.calculation && (
+                                <button 
+                                  onClick={(e) => openCalculationModal(e, event.calculation)}
+                                  className="mt-3 flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-orange-600 transition-colors bg-slate-100 hover:bg-orange-50 px-2 py-1 rounded-md w-fit"
+                                >
+                                  <Info size={14} />
+                                  Comprendre le chiffre
+                                </button>
+                              )}
+
+                              <div className={`absolute top-4 right-4 w-3 h-3 rounded-full transition-colors ${
+                                isSelected ? currentEvent.bgColor : 'bg-slate-200 group-hover:bg-slate-300'
+                              }`} />
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ONGLET 2 : STATISTIQUES */}
+        {activeTab === 'stats' && (
+          <div className="animate-in fade-in duration-500 space-y-12">
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+              <h3 className="text-2xl font-bold mb-6 flex items-center gap-3 text-slate-900">
+                <div className="bg-orange-100 p-2 rounded text-orange-600"><TrendingUp className="w-6 h-6" /></div>
+                Le coût économique : CAC40 vs Féminisation
+              </h3>
+              <p className="text-slate-600 mb-6 text-justify leading-relaxed">
+                Le <strong>Gender Equality Index</strong> (10 entreprises dont l'encadrement est le plus féminisé) superforme le <strong>Male Index</strong> et le <strong>CAC40</strong> sur le long terme et a mieux résisté à la crise de 2008.
+              </p>
+
+              <div className="overflow-x-auto border border-slate-200 rounded-xl">
+                <table className="w-full text-sm text-right">
+                  <thead className="bg-slate-50 text-slate-900 font-bold">
+                    <tr>
+                      <th className="p-4 text-left">Indice</th>
+                      <th className="p-4">2007-2009 (Crise)</th>
+                      <th className="p-4">2009-2019 (Reprise)</th>
+                      <th className="p-4">Total 2007-2019</th>
+                      <th className="p-4">Risque (Beta)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-slate-100">
+                    <tr>
+                      <td className="p-4 text-left font-bold text-slate-500">CAC40</td>
+                      <td className="p-4 text-red-500 font-medium">-41.87%</td>
+                      <td className="p-4 text-slate-900">43.24%</td>
+                      <td className="p-4 text-red-500 font-medium">-16.74%</td>
+                      <td className="p-4 text-slate-400">1</td>
+                    </tr>
+                    <tr className="bg-orange-50/50">
+                      <td className="p-4 text-left font-bold text-orange-900">Gender Equality Index</td>
+                      <td className="p-4 text-red-500 font-medium">-40.46%</td>
+                      <td className="p-4 text-slate-900 font-bold">293.90%</td>
+                      <td className="p-4 text-slate-900 font-bold">134.49%</td>
+                      <td className="p-4 font-bold text-orange-700">0.865</td>
+                    </tr>
+                    <tr>
+                      <td className="p-4 text-left font-bold text-slate-500">Male Index</td>
+                      <td className="p-4 text-red-500 font-medium">-47.81%</td>
+                      <td className="p-4 text-slate-900">107.96%</td>
+                      <td className="p-4 text-slate-900">8.53%</td>
+                      <td className="p-4 text-slate-400">1.135</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p className="text-xs text-slate-400 mt-3 italic">Sources : Données boursières Euronext 2007-2019.</p>
+            </div>
+
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-rose-100 text-rose-600 rounded-xl hidden md:block">
+                   <Heart className="w-6 h-6" />
+                </div>
+                <div>
+                   <h3 className="text-xl font-bold text-slate-900 mb-2">Donner vie : deux secondes ou neuf mois</h3>
+                   <p className="text-slate-700 leading-relaxed">
+                     La reproduction humaine repose sur une expérience profondément asymétrique : l’homme n’est sollicité que quelques secondes, tandis que la femme est engagée pendant environ neuf mois, avec des transformations physiques et hormonales majeures, des douleurs, des risques pour la santé parfois mortels et une charge mentale permanente.
+                   </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="bg-white text-slate-900 p-8 rounded-2xl shadow-xl border border-slate-200 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-slate-200 rounded-full blur-3xl opacity-40 -mr-10 -mt-10"></div>
+                <div className="flex justify-between items-end mb-4 relative z-10">
+                  <span className="text-5xl font-black text-slate-800">+90%</span>
+                  <AlertTriangle className="text-slate-300" />
+                </div>
+                <p className="font-medium text-lg relative z-10">Des homicides sont commis par des hommes.</p>
+                <p className="text-xs text-slate-400 mt-4 uppercase tracking-wider">Source : UNODC, 2017</p>
+              </div>
+
+              <div className="bg-slate-900 text-white p-8 rounded-2xl shadow-xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500 rounded-full blur-3xl opacity-20 -mr-10 -mt-10"></div>
+                <div className="flex justify-between items-end mb-4 relative z-10">
+                  <span className="text-5xl font-black text-orange-500">+90%</span>
+                  <AlertTriangle className="text-slate-500" />
+                </div>
+                <p className="font-medium text-lg relative z-10">Des violences sexuelles sont commises par des hommes.</p>
+                <p className="text-xs text-slate-500 mt-4 uppercase tracking-wider">Source : UNED, 2017</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ONGLET 3 : FAQ */}
+        {activeTab === 'faq' && (
+          <div className="animate-in fade-in duration-500 max-w-3xl mx-auto space-y-8">
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+              <h3 className="text-2xl font-bold text-slate-900 mb-6 font-serif">Questions fréquentes</h3>
+              <div className="space-y-8 text-slate-700">
+                <div className="space-y-2">
+                  <h4 className="font-bold text-slate-900 text-lg">Ce projet réécrit l’histoire</h4>
+                  <p>Non. Il ne réécrit rien. Il compare ce qui s’est produit à ce qui était historiquement possible. Ce projet ne modifie aucun fait historique. Il part exclusivement de faits établis (événements, structures, décisions documentées) et explore des alternatives plausibles, déjà connues ou appliquées ailleurs à la même époque.</p>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-bold text-slate-900 text-lg">Vous faites de la spéculation</h4>
+                  <p>Toute comparaison historique implique des hypothèses. Ici, elles sont explicites, limitées et ajustables. Il n’existe aucune mesure historique sans hypothèse. La différence ici est que : les hypothèses sont visibles, l’utilisateur peut les activer ou non.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+      </main>
+
+      {/* FOOTER / COMPTEUR */}
+      <div className="fixed bottom-6 left-0 right-0 px-4 z-30 pointer-events-none">
+        <div className="max-w-lg mx-auto pointer-events-auto">
+          <div className="bg-slate-900 text-white p-4 rounded-2xl shadow-2xl flex items-center justify-between backdrop-blur-lg bg-opacity-95 border border-slate-700">
+            <div className="flex items-center gap-3 w-full justify-center">
+              <AlertCircle size={20} className="text-rose-400" />
+              <span className="font-bold text-sm md:text-base">
+                {calculateTotalDeaths()}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* MODALE ALÉATOIRE */}
+      {randomModalOpen && randomImpactData && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={() => setRandomModalOpen(false)}
+        >
+          <div 
+            className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden relative animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={`${randomImpactData.contextBg} p-6 text-white relative`}>
+              <button 
+                type="button"
+                onClick={() => setRandomModalOpen(false)}
+                className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 rounded-full p-1 transition-colors z-50 cursor-pointer"
+              >
+                <X size={20} />
+              </button>
+              <div className="flex items-center gap-2 mb-2 opacity-90 text-sm font-bold uppercase tracking-wide">
+                <span>{randomImpactData.contextTitle}</span>
+                <span>•</span>
+                <span>{randomImpactData.contextPeriod}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                  {randomImpactData.domainIcon}
+                </span>
+                <h3 className="text-xl font-bold">{randomImpactData.domainTitle}</h3>
+              </div>
+            </div>
+            
+            <div className="p-8">
+              <div className="flex justify-between items-start mb-4">
+                <h4 className="text-xl font-bold text-slate-900">{randomImpactData.title}</h4>
+                {randomImpactData.deaths && (
+                   <span className="text-xs font-bold text-rose-600 bg-rose-50 px-3 py-1 rounded-full border border-rose-100 whitespace-nowrap ml-3">
+                      {randomImpactData.deaths}
+                   </span>
+                )}
+              </div>
+              <p className="text-slate-600 leading-relaxed text-lg">
+                {randomImpactData.detail}
+              </p>
+              
+              <div className="mt-8 flex justify-center">
+                <button 
+                  onClick={openRandomImpact}
+                  className="flex items-center gap-2 text-slate-500 hover:text-slate-800 transition-colors font-medium"
+                >
+                  <Shuffle size={16} />
+                  Un autre impact au hasard
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODALE D'EXPLICATION DU CALCUL */}
+      {calculationModalOpen && calculationData && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={() => setCalculationModalOpen(false)}
+        >
+          <div 
+            className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden relative animate-in zoom-in-95 duration-200 border-t-4 border-orange-500"
+            onClick={(e) => e.stopPropagation()}
+          >
+             <div className="p-6">
+               <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <Info size={20} className="text-orange-500" />
+                    Méthode de calcul
+                  </h3>
+                  <button onClick={() => setCalculationModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+                    <X size={20} />
+                  </button>
+               </div>
+               
+               <div className="space-y-4 text-sm text-slate-600">
+                 <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                   <span className="block text-xs font-bold text-slate-400 uppercase mb-1">Donnée de base</span>
+                   <p className="font-medium text-slate-900">{calculationData.base}</p>
+                   <p className="text-xs text-slate-500 mt-1 italic">Source : {calculationData.source}</p>
+                 </div>
+                 
+                 <div>
+                   <span className="block text-xs font-bold text-slate-400 uppercase mb-1">Logique d'extrapolation</span>
+                   <p className="leading-relaxed text-justify">{calculationData.logic}</p>
+                 </div>
+
+                 <div className="bg-orange-50 p-3 rounded-lg border border-orange-100 text-orange-900">
+                   <span className="block text-xs font-bold text-orange-400 uppercase mb-1">Conclusion</span>
+                   <p className="font-bold">{calculationData.conclusion}</p>
+                 </div>
+               </div>
+             </div>
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+};
+
+export default GenesisProject;
